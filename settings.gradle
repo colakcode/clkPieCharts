@@ -1,0 +1,3 @@
+include ':DonutChart'
+include ':app'
+rootProject.name = "clkPieCharts"
