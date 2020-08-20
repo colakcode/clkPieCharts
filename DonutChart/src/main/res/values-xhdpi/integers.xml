@@ -1,28 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <integer name="table_graph_ts">30</integer>
-    <integer name="table_graph_column_ts">40</integer>
+    <integer name="table_graph_ts">18</integer>
+    <integer name="table_graph_column_ts">35</integer>
     <integer name="table_graph_stroke">5</integer>
     <integer name="graph_bttn_h">1</integer>
     <integer name="graph_h">7</integer>
     <integer name="graph_list_h">3</integer>
     <integer name="cake_graph_text_size">44</integer>
-    <integer name="axis_radius">10</integer>
-    <integer name="month_name_gap">40</integer>
-    <integer name="bar_stroke">80</integer>
+    <integer name="month_name_gap">25</integer>
+    <integer name="axis_radius">5</integer>
+    <integer name="bar_stroke">38</integer>
     <integer name="line_stroke">5</integer>
-    <integer name="pie_line_stroke">5</integer>
+    <integer name="pie_line_stroke">2</integer>
     <integer name="cake_graph_text_size_warn">80</integer>
     <integer name="cake_graph_offset_max">120</integer>
     <integer name="cake_graph_offset_min">15</integer>
-    <integer name="cake_graph_gap_stop">200</integer>
+    <integer name="cake_graph_gap_stop">100</integer>
     <integer name="cake_graph_gap_start">650</integer>
     <integer name="text_x_back">100</integer>
     <integer name="pie_text_width">250</integer>
     <integer name="pie_text_height">75</integer>
     <integer name="middle_circle_radius">200</integer>//
-    <integer name="qua_gap">120</integer>// cake graph line kıvrılma noktası
+    <integer name="qua_gap">60</integer>// cake graph line kıvrılma noktası
     <integer name="pie_text_size">7</integer>//
     <integer name="sw">0</integer>//
+
 </resources>

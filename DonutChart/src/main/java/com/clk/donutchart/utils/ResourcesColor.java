@@ -1,7 +1,9 @@
-package com.clk.donutchart;
+package com.clk.donutchart.utils;
 
 import android.app.Activity;
 import android.content.Context;
+
+import com.clk.donutchart.R;
 
 /**
  * Created by CLK on 09.09.2018.

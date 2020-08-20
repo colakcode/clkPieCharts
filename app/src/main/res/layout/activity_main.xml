@@ -9,8 +9,8 @@
     android:background="@color/grey_lighter">
 
     <RelativeLayout
-        android:layout_width="350dp"
-        android:layout_height="350dp"
+        android:layout_width="600dp"
+        android:layout_height="600dp"
         android:id="@+id/layoutGraph"
         android:layout_centerInParent="true"/>
 

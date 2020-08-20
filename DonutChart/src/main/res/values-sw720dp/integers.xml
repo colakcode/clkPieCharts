@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+
     <integer name="table_graph_ts">30</integer>
     <integer name="table_graph_column_ts">40</integer>
     <integer name="table_graph_stroke">5</integer>
@@ -19,10 +20,11 @@
     <integer name="cake_graph_gap_stop">200</integer>
     <integer name="cake_graph_gap_start">650</integer>
     <integer name="text_x_back">100</integer>
-    <integer name="pie_text_width">250</integer>
-    <integer name="pie_text_height">75</integer>
+    <integer name="pie_text_width">600</integer>
+    <integer name="pie_text_height">180</integer>
     <integer name="middle_circle_radius">200</integer>//
     <integer name="qua_gap">120</integer>// cake graph line kıvrılma noktası
-    <integer name="pie_text_size">7</integer>//
+    <integer name="pie_text_size">12</integer>//
     <integer name="sw">0</integer>//
+
 </resources>

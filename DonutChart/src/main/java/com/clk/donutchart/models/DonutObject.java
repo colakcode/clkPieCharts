@@ -1,4 +1,4 @@
-package com.clk.donutchart;
+package com.clk.donutchart.models;
 
 public class DonutObject {
     String id;

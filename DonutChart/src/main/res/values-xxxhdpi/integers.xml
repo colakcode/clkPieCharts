@@ -25,4 +25,5 @@
     <integer name="qua_gap">120</integer>// cake graph line kıvrılma noktası
     <integer name="pie_text_size">7</integer>//
     <integer name="sw">0</integer>//
+
 </resources>

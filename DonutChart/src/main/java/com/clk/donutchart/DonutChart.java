@@ -12,22 +12,32 @@ import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Handler;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import com.clk.donutchart.Interfaces.ClickDonutSlice;
+import com.clk.donutchart.models.DonutObject;
+import com.clk.donutchart.utils.AmountAccetable;
+import com.clk.donutchart.utils.ParseString;
+import com.clk.donutchart.utils.ResourcesColor;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
+/*
+* @colakcode on GitHub 18.08.2020
+*/
+
 public class DonutChart extends View {
 
-    private static final String TAG = "clkDonutChart";
-    private int number_of_categories = 36;
-    private int angle_step = 360 / number_of_categories;
+    private static final String TAG = "clk_DonutChart";
+    private int max_number = 36;
+    private int angle_step = 360 / max_number;
     private int gapStart = getContext().getResources().getInteger(R.integer.cake_graph_gap_start);
     private int gapStop = getContext().getResources().getInteger(R.integer.cake_graph_gap_stop);
     private List<Integer> defaultTBx;//default TextBox X
@@ -57,8 +67,9 @@ public class DonutChart extends View {
     private RectF[] ovals;
     private int paintTextSize = getContext().getResources().getInteger(R.integer.cake_graph_text_size);
     private int textSizeWarn = getContext().getResources().getInteger(R.integer.cake_graph_text_size_warn);
-    private Paint paintWhite, paintGraphLine, paintWarn, paintBody;
+    private Paint paintWhite, paintGraphLine, paintWarn, paintBody, paintMiddleText;
     private int line_stroke = getContext().getResources().getInteger(R.integer.pie_line_stroke);
+    private Typeface tommyFontBold;
 
     private void init() {
 
@@ -81,13 +92,13 @@ public class DonutChart extends View {
         defaultTBy = new ArrayList<>();
 
         //Paint, path ve region öğeleri tanımlandı ve maximum kategori sayısı kadar oluşturuldu
-        paint = new Paint[number_of_categories];
-        paintLine = new Paint[number_of_categories];
-        path = new Path[number_of_categories];
-        region = new Region[number_of_categories];
-        ovals = new RectF[number_of_categories];
+        paint = new Paint[max_number];
+        paintLine = new Paint[max_number];
+        path = new Path[max_number];
+        region = new Region[max_number];
+        ovals = new RectF[max_number];
 
-        for (int t = 0; t < number_of_categories; t++) {
+        for (int t = 0; t < max_number; t++) {
             paint[t] = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint[t].setTextSize(paintTextSize);
             ovals[t] = new RectF();
@@ -95,7 +106,6 @@ public class DonutChart extends View {
             paint[t].setColor(rColor.getColor(t));
             path[t] = new Path();
             region[t] = new Region();
-
 
             paintLine[t] = new Paint(Paint.ANTI_ALIAS_FLAG);
             paintLine[t].setTextSize(paintTextSize);
@@ -105,7 +115,7 @@ public class DonutChart extends View {
 
         }
 
-        //Beyaz, siyah ve uyarı öğerleri için paintler oluşturuldu
+        tommyFontBold = Typeface.createFromAsset(activity.getAssets(), "fonts/tommy_soft_bold.otf");
         paintWhite = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintWhite.setColor(getContext().getResources().getColor(R.color.white));
         paintWhite.setTextSize(paintTextSize);
@@ -119,6 +129,12 @@ public class DonutChart extends View {
         paintGraphLine.setDither(true);
         paintGraphLine.setStyle(Paint.Style.STROKE);
         paintGraphLine.setStrokeWidth(6);
+
+        paintMiddleText = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintMiddleText.setColor(activity.getResources().getColor(R.color.grey_text));
+        paintMiddleText.setDither(true);
+        paintMiddleText.setTypeface(tommyFontBold);
+        paintMiddleText.setTextAlign(Paint.Align.RIGHT);
 
         paintWarn = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintWarn.setColor(getContext().getResources().getColor(R.color.grey_dark));
@@ -142,27 +158,26 @@ public class DonutChart extends View {
     private int radius;
     private int middle_circle_radius = getContext().getResources().getInteger(R.integer.middle_circle_radius);
     private int sweepWhite = 360;
+    private Canvas canvas;
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
+        this.canvas = canvas;
         canvas.drawColor(bodyColor);
         paintBody.setColor(bodyColor);
         /*
-         * 1- OnDraw tanımlamalar yapıldı. pie_ çember üzerindeki nokta, fold_ kıvrım noktası, tb_ textBox'ların orta noktası
-         * 2- TextBox (tb) ların genişlik ve yükseklik değerleri atandı
-         * 3- Çember üstü noktalar(pie_x,y) ve kıvrım noktaları(qua_x,y) eklendi
-         * 4- Çember üstü --> ve kıvrım noktasına, kıvrım noktasında --> textBox noktalarına çizimler yapıldı
-         * */
+         * 1- Measurements are calculated
+         * 2- TextBox witdh and height are calculated
+         * 3- Circle points and fold points are calculated
+         * 4- Lines are drawing from the circle edge to fold point and from the fold point to textBox point
+         */
 
-        //1- OnDraw tanımlamalar ve eşitlikler
+        //1 -
         center_x = getWidth() / 2;
         center_y = getHeight() / 2;
-
         if (getWidth() > getHeight()) gapStop = getHeight() / 6;
         else gapStop = getHeight() / 5;
-
-        //grafiğin başlangıç ve bitiş noktalarının belirlenmesi
         width = getHeight();
         offset = (getWidth() - getHeight()) / 2;
         x_start = gapStart + offset;
@@ -170,25 +185,22 @@ public class DonutChart extends View {
         y_start = gapStart;
         y_stop = width - gapStart;
         radius = (width - gapStart * 2) / 2;
-        middle_circle_radius = radius / 2;//orta beyaz(yıl)
-        fold_gap = (int) getWidth() / 14; // çember üzeri noktadan kıvrım noktasını belirleyen boşluk
+        middle_circle_radius = radius / 2;
+        fold_gap = (int) getWidth() / 14;
 
-        //2- TextBox (tb) ların genişlik ve yükseklik değerleri atandı
+        //2- TextBox (tb) width and height
         tbWidth = (int) (getWidth() / 10);
         tbHeight = (int) (getHeight() / 17.33);
 
-        for (int i = 0; i < number_of_categories; i++) {
+        for (int i = 0; i < max_number; i++) {
             int gap_x = getWidth() / 4;
             int gap_y = getHeight() / 5;
-
-            //Log.d(TAG, "onDraw: gap_x:"+gap_x+" gap_y:"+gap_y);
 
             int x = angularPoints(i * angle_step, gap_x).get(0);
             int y = angularPoints(i * angle_step, gap_y).get(1);
 
             defaultTBx.add(x);
             defaultTBy.add(y);
-            //Log.d(TAG, "onDraw: x:"+x+" y:"+y+"angle_step");
         }
 
         RectF oval = new RectF();
@@ -196,7 +208,7 @@ public class DonutChart extends View {
         oval.set(x_start, y_start, x_stop, y_stop);
         oval2.set(0, 0, getRight(), getBottom());
 
-        //3- Çember üstü noktalar(pie_x,y) ve kıvrım noktaları(qua_x,y) eklendi
+        //3- add the circle edge point(pie_x,y) and fold point(qua_x,y) eklendi
         for (int k = 0; k < donutObjects.size(); k++) {
 
             int real_angle = start_angle.get(k) + sweep_angle.get(k) / 2;
@@ -205,15 +217,13 @@ public class DonutChart extends View {
             pie_y.add(angularPoints(real_angle, 0).get(1));
             qua_x.add(angularPoints(real_angle, fold_gap).get(0));
             qua_y.add(angularPoints(real_angle, fold_gap).get(1));
-
-            //Log.d(TAG, "onDraw: real_angle:" + real_angle);
         }
 
-        //4- Çember üstü --> ve kıvrım noktasına, kıvrım noktasında --> textBox noktalarına çizimler yapıldı
-        // tb_x,y noktaları createTexBox metodu içerisinde yaratıldı
+        //4- draw lines from the circle edge to fold poin and from the fold point to textBox point
+        // tb_x,y points are created in createTextBox
         if (control_text) {
             try {
-                for (int i = 0; i < tb_x.size(); i++) {
+                for (int i = 0; i < donutObjects.size(); i++) {
                     final Path pathf = new Path();
                     pathf.moveTo(pie_x.get(i), pie_y.get(i));
                     pathf.quadTo(qua_x.get(i), qua_y.get(i), tb_x.get(i), tb_y.get(i));
@@ -221,16 +231,16 @@ public class DonutChart extends View {
                 }
             } catch (Exception e) {
             }
+
         }
 
-        canvas.drawCircle(center_x, center_y, middle_circle_radius, paintBody);// yıl bilgisinin olduğu orta nokta beyaza boyanır
-        // en üst beyaz katman tamamen beyaza boyanır sweepWhite azaltılarak kaldırılır
+        // middle layer swipe
+        canvas.drawCircle(center_x, center_y, middle_circle_radius, paintBody);
+        // top layer swipe
         canvas.drawArc(oval2, 0, sweepWhite, true, paintBody);
 
-    }
+        if(control_text) drawMiddleText();
 
-    public void setBodyColor(int color){
-        bodyColor = color;
     }
 
     public List<Integer> angularPoints(int real_angle, int gap) {
@@ -255,41 +265,40 @@ public class DonutChart extends View {
 
     private List<String> percentValue;
 
-    public void drawGraphs(List<DonutObject> donutObjects) {
+    public void setParams(List<DonutObject> donutObjects) {
 
         /*
-        * SINIF ÇAĞRILDIKTAN SONRA, İLK ÇAĞRILAN METHOD
+        * THIS IS THE FIRS METHOD AFTER CONSTURACTOR IN ACTIVITY THAT CALLED THIS CLASS
         * 1- Tanımlamalar yapılır, dizeler temizlenir
-        * 2- Kategori başına oranlama yapabilmek için toplam değer bulunur
-        * 3- Toplam değer kullanılarak kategori başına tarama açısı hesaplanır,
-             Kategori kutucuklarında görüntülemek üzere percentValue dizesine eklenir
-        * */
+        * 2- Total value is found to be able to rate per value
+        * 3- Swipe angle is calculated using totalValue per value
+             Created percenValue to shown in textBoxt
+        */
 
-        // Tanımlamalar
         this.donutObjects = donutObjects;
         start_angle = new ArrayList<>();
         sweep_angle = new ArrayList<>();
-        double sumExpenses = 0;
+        double totalValue = 0;
         percentValue = new ArrayList<>();
         int sweepAngle = 0;
         int startAngle = 0;
 
-        //Kategori başına oranlama yapabilmek için toplam değer bulunur
+        //Total value is found to be able to rate per value
         for (int i = 0; i < donutObjects.size(); i++) {
-            sumExpenses = sumExpenses + donutObjects.get(i).getValue();
+            totalValue = totalValue + donutObjects.get(i).getValue();
         }
 
-        // Toplam değer kullanılarak kategori başına tarama açısı hesaplanır,
-        // Kategori kutucuklarında görüntülemek üzere percentValue dizesine eklenir
+        // Swipe angle is calculated using totalValue per value
+        // Created percenValue to shown in textBoxt
         int sumSweep = 0;
         for (int j = 0; j < donutObjects.size(); j++) {
 
             startAngle = sumSweep;
 
-            sweepAngle = (int) ((360 * donutObjects.get(j).getValue()) / sumExpenses);
+            sweepAngle = (int) ((360 * donutObjects.get(j).getValue()) / totalValue);
 
             percentValue.add(j, String.valueOf(
-                    AmountAccetable.floorDouble((100 * donutObjects.get(j).getValue()) / sumExpenses)));
+                    AmountAccetable.floorDouble((100 * donutObjects.get(j).getValue()) / totalValue)));
 
             sumSweep = sumSweep + sweepAngle;
 
@@ -302,8 +311,6 @@ public class DonutChart extends View {
 
             if (percentValue.get(j).equals("0")) percentValue.set(j, "");
             else percentValue.add(j, " " + percentValue.get(j) + " %");
-
-            //Log.i("clkinfo", "start : " + "" + startAngle + "   sweep : " + sweepAngle);
 
         }
 
@@ -319,31 +326,21 @@ public class DonutChart extends View {
     private boolean control_text = false;
     public void setTextBoxes() {
         /*
-         * IKINCI OLARAK OLARAK ÇAĞRILAN METHOD
-         * 1- Default olarak 36 adet TextView oluşturuldu ve içerisine "" olarak dolduruldu
-         * 2- 1000 sn gecikmeli olarak kullanılan kategoriler (categories_used) textView'lara yazıldı
-         * yıl değeri grafik ortasına sabitlendi, control_text mantıksal değeri true olarak ayarlandı
+         * SECOND CALLED METHOD (IT IS CALLED IN SETPARAMS)
+         * 1- 36 TextBoxes were created by default and "" was written in them.
+         * 2- Object names written in textBoxes with 1000 ms delay, middle text is writen middle of graphic
          * */
-        textView = new TextView[36];
-//        for (int l = 0; l < number_of_categories; l++) { GEREK GÖRÜLMEDİĞİ İÇİN KALDIRILDI
-//            if (textView[l] != null) {
-//                textView[l].setText("");
-//            }
-//        }
+        textView = new TextView[max_number];
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 for (int k = 0; k < donutObjects.size(); k++) {
                     int real_angle = start_angle.get(k) + (sweep_angle.get(k) / 2);
-
-                    //Kategori tarama payları ile belirlenen start ve sweep angle değerleriyle tek tek
-                    // textBox lar çağrılıyor. Buradaki real_angle hangi textBox ın en yakın olacağı
-                    //hesabında kullanılacak
                     createTextBox(optimizeName(donutObjects.get(k).getName()) + "\n" + percentValue.get(k),
                             real_angle, k, donutObjects.get(k).getId());
                 }
-                setMiddleText();
+                drawMiddleText();
                 control_text = true;
             }
 
@@ -354,17 +351,15 @@ public class DonutChart extends View {
     private int textSize = getContext().getResources().getInteger(R.integer.pie_text_size);
     private List<String> categoryInBox;
 
-    public void createTextBox(String text, int real_angle, final int position,final  String tag) {
-        //textView = new TextView[number_of_categories];
+    public void createTextBox(String text, int real_angle, final int position,final  String id) {
         try {
             List<Integer> circlePoints = angularPoints(real_angle, 0);
 
             int k = 0;
             double control = getWidth();
 
-            // Teker teker bakılıp en yakını bulunuyor (defaultTBX ve TBy önceden belirlendi
-            // en yakın noktanın positionu bulunacak )
-            for (int j = 0; j < number_of_categories; j++) {
+            //textBoxes have already been created. The closest to the midpoint of the object angle is calculated
+            for (int j = 0; j < max_number; j++) {
                 int diffX = defaultTBx.get(j) - circlePoints.get(0);
                 int diffY = defaultTBy.get(j) - circlePoints.get(1);
                 double hipo = Math.pow(diffX, 2) + Math.pow(diffY, 2);
@@ -376,23 +371,21 @@ public class DonutChart extends View {
             }
 
             if (textView[k] != null) {
-                for (int j = k; j < number_of_categories; j++) {
+                for (int j = k; j < max_number; j++) {
                     if (textView[j] == null) {
                         k = j;
                         break;
-                    } else if (j == number_of_categories - 1 && textView[j] != null) {
+                    } else if (j == max_number - 1 && textView[j] != null) {
                         j = 0;
                     }
                 }
-            } else {
-                k = k;
             }
 
             textView[k] = new TextView(activity);
             RelativeLayout.LayoutParams params = new RelativeLayout.LayoutParams(
                     RelativeLayout.LayoutParams.WRAP_CONTENT, RelativeLayout.LayoutParams.WRAP_CONTENT);
             textView[k].setText(" " + text);
-            textView[k].setBackgroundDrawable(getResources().getDrawable(R.drawable.pie_text_rect));
+            textView[k].setBackground(getResources().getDrawable(R.drawable.pie_text_rect));
             textView[k].setTextSize(textSize);
             textView[k].setTypeface(textView[k].getTypeface(), Typeface.BOLD);
             textView[k].setTextColor(Color.GRAY);
@@ -403,8 +396,6 @@ public class DonutChart extends View {
 
             int x = defaultTBx.get(k);
             int y = defaultTBy.get(k);
-
-            //Log.d(TAG, "createTextBox: x:"+x+" y:"+y);
 
             if (x < 0) x = 0;
             else if (x > width) x = width;
@@ -417,47 +408,31 @@ public class DonutChart extends View {
 
             layoutGraph.addView(textView[k], params);
 
-
-            /* BAKKKK???????????
             textView[k].setOnClickListener(new OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    ClickPieInterface clickPieInterface =(ClickPieInterface)activity;
-                    clickPieInterface.pickPieOfChart(position,tag);
+                    ClickDonutSlice clickDonutSlice =(ClickDonutSlice) activity;
+                    clickDonutSlice.getSliceInfo(donutObjects.get(position),position);
                 }
             });
-
-            */
 
             categoryInBox = new ArrayList<>();
             boolean check = true;
             for (int g = 0; g < categoryInBox.size(); g++) {
-                if (tag.equals(categoryInBox.get(g))) {
+                if (id.equals(categoryInBox.get(g))) {
                     check = false;
                     break;
                 }
             }
 
             if (check || position == 0) {
-                categoryInBox.add(tag);
-                tb_x.add(x + tbWidth / 2); // tb_x çizginin vardığı nokta, tbWidth textBox'ın genişliği
+                categoryInBox.add(id);
+                tb_x.add(x + tbWidth / 2);
                 tb_y.add(y + tbHeight / 2);
             }
         } catch (Exception e) {
-            //Toast.makeText(context, "catch", Toast.LENGTH_LONG).show();
+            e.printStackTrace();
         }
-    }
-
-    public TextView[] getTextViews() {
-        return textView;
-    }
-
-//    public List<String> categories_used() {
-//        return categories_used;
-//    }
-
-    public List<String> getCategoryInBox() {
-        return categoryInBox;
     }
 
     public void setMiddleText() {
@@ -501,6 +476,50 @@ public class DonutChart extends View {
 
     }
 
+    private void drawMiddleText(){
+        String new_middle_text="";
+        List<String> list = ParseString.get(middle_text," ");
+        for(String s:list){
+            new_middle_text = middle_text +"\n"+s;
+        }
+
+        float ver_step = width/12;
+
+        int size = list.size();
+
+        if(size == 1){
+
+        }
+        if(size > 1){
+            ver_step =width/15;
+        }
+        if(size > 3) ver_step = width/18;
+        if(size > 4) ver_step = width/20;
+
+        float y = center_y - ver_step * (size-1)/2;
+        float x = center_x;
+
+        float ts = ver_step;
+        String longest_word = "";
+        for(int i=0; i<list.size();i++){
+            if(list.get(i).length() > longest_word.length()) longest_word = list.get(i);
+        }
+
+        ver_step = width/2;
+        ver_step = ver_step - ver_step/8;
+        ver_step = ver_step/(longest_word.length()+2);
+        paintMiddleText.setTextSize(ver_step);
+        paintMiddleText.setTextAlign(Paint.Align.CENTER);
+        for(int i=0; i<list.size();i++){
+            canvas.drawText(list.get(i),x,y+ver_step*i +(ver_step/(size+1)) ,paintMiddleText);
+        }
+
+    }
+
+    public void setBodyColor(int color){
+        bodyColor = color;
+    }
+
     public void changeAngle() {
 
         new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -512,8 +531,7 @@ public class DonutChart extends View {
 
                 if (sweepWhite <= 0) {
                     cancel();
-                    //sharedPref.save(context, "check_statistic", "true");
-                    check_statistic = true;
+                    isGraphicFinished = true;
                     return;
                 }
                 postInvalidate();
@@ -548,38 +566,32 @@ public class DonutChart extends View {
                         alfaDeg = 360 - alfaDeg;
 
                     }
-                    //Log.d(TAG, "onTouchEvent: cateSize :"+categoryInBox.size());
 
                     for (int i = 0; i < donutObjects.size(); i++) {
-
                         if (alfaDeg > start_angle.get(i)
                                 && alfaDeg < start_angle.get(i) + sweep_angle.get(i)) {
                             try {
-
-                                /*
-                                ClickPieInterface clickPieInterface =(ClickPieInterface)activity;
-                                clickPieInterface.pickPieOfChart(i, category_tags.get(i)); */
-
+                                ClickDonutSlice clickDonutSlice =(ClickDonutSlice)activity;
+                                clickDonutSlice.getSliceInfo(donutObjects.get(i), i);
                             } catch (Exception e) {
+                                Log.d(TAG, "onTouchEvent: "+e.getMessage());
                             }
                         }
                     }
                 }
             }
-            case MotionEvent.ACTION_MOVE: {
-            }
         }
         return value;
     }
 
-    public static boolean check_statistic = false;
+    public static boolean isGraphicFinished = false;
 
-    public static boolean isCheck_statistic() {
-        return check_statistic;
+    public static boolean isDrawingFinished() {
+        return isGraphicFinished;
     }
 
-    public static void setCheck_statistic(boolean check) {
-        check_statistic = check;
+    public static void setIsGraphicFinished(boolean check) {
+        isGraphicFinished = check;
     }
 
     public String optimizeName(String category) {

@@ -1,4 +1,4 @@
-package com.clk.donutchart;
+package com.clk.donutchart.utils;
 
 import android.app.Activity;
 import android.util.AttributeSet;
@@ -6,6 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
+
+import com.clk.donutchart.DonutChart;
+import com.clk.donutchart.R;
+import com.clk.donutchart.models.DonutObject;
 
 import java.util.List;
 
@@ -47,7 +51,7 @@ public class DonutLayout extends FrameLayout {
     public void run(Activity activity, List<DonutObject> donutObjects, String middle_text){
         layoutGraph = (RelativeLayout) view.findViewById(R.id.layoutGraph);
         DonutChart donutChart = new DonutChart(activity, layoutGraph, middle_text);
-        donutChart.drawGraphs(donutObjects);
+        donutChart.setParams(donutObjects);
         layoutGraph.addView(donutChart);
     }
 }

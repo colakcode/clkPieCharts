@@ -1,4 +1,4 @@
-package com.clk.donutchart;
+package com.clk.donutchart.utils;
 
 import android.util.Log;
 
