@@ -19,6 +19,7 @@ public class DonutObject {
         this.id = id;
         this.name = name;
         this.value = value;
+        this.color = 0;
     }
 
     public String getId() {

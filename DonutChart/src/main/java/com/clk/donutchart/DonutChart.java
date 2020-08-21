@@ -40,28 +40,27 @@ public class DonutChart extends View {
     private int angle_step = 360 / max_number;
     private int gapStart = getContext().getResources().getInteger(R.integer.cake_graph_gap_start);
     private int gapStop = getContext().getResources().getInteger(R.integer.cake_graph_gap_stop);
-    private List<Integer> defaultTBx;//default TextBox X
-    private List<Integer> defaultTBy;//default TextBox Y
+    private List<Integer> defaultTBx;
+    private List<Integer> defaultTBy;
     private RelativeLayout layoutGraph;
     private ResourcesColor rColor;
     private Activity activity;
     private int bodyColor = getContext().getResources().getColor(R.color.white);
     private int middleTextColor = getContext().getResources().getColor(R.color.grey_text);
     private List<DonutObject> donutObjects;
-    private String middle_text;
-
+    private String middle_text="";
 
     public DonutChart(Activity activity, RelativeLayout layoutGraph, String middle_text) {
         super(activity);
         this.activity=activity;
         this.layoutGraph = layoutGraph;
         this.middle_text = middle_text;
-
         init();
     }
 
     private Paint[] paint;
     private Paint[] paintLine;
+    private Paint paintObject, paintLines;
     private Path[] path;
     private Region[] region;
     private RectF[] ovals;
@@ -69,7 +68,7 @@ public class DonutChart extends View {
     private int textSizeWarn = getContext().getResources().getInteger(R.integer.cake_graph_text_size_warn);
     private Paint paintWhite, paintGraphLine, paintWarn, paintBody, paintMiddleText;
     private int line_stroke = getContext().getResources().getInteger(R.integer.pie_line_stroke);
-    private Typeface tommyFontBold;
+    private Typeface textFont;
 
     private void init() {
 
@@ -81,17 +80,15 @@ public class DonutChart extends View {
         tb_x = new ArrayList<>();
         tb_y = new ArrayList<>();
 
-        /*Sınıfın çağrılması ile birlikte initilization methodu çağrılır ve tüm ön işlemler gerlekleştirilir
+        /* Sınıfın çağrılması ile birlikte initilization methodu çağrılır ve tüm ön işlemler gerlekleştirilir
          * 1- Default textBox noktaları angularPoints(açısal noktalar) defaultTBx_y dizelerine atılır
          * 2- Paint, path ve region öğeleri tanımlandı ve maximum kategori sayısı kadar oluşturuldu
          * 3- Beyaz, siyah ve uyarı öğerleri için paintler oluşturuldu
          * */
 
-        // Default textBox noktaları angularPoints(açısal noktalar) defaultTBx_y dizelerine atılır
         defaultTBx = new ArrayList<>();
         defaultTBy = new ArrayList<>();
 
-        //Paint, path ve region öğeleri tanımlandı ve maximum kategori sayısı kadar oluşturuldu
         paint = new Paint[max_number];
         paintLine = new Paint[max_number];
         path = new Path[max_number];
@@ -102,7 +99,6 @@ public class DonutChart extends View {
             paint[t] = new Paint(Paint.ANTI_ALIAS_FLAG);
             paint[t].setTextSize(paintTextSize);
             ovals[t] = new RectF();
-            //paint[t].setTextScaleX(25);
             paint[t].setColor(rColor.getColor(t));
             path[t] = new Path();
             region[t] = new Region();
@@ -115,7 +111,17 @@ public class DonutChart extends View {
 
         }
 
-        tommyFontBold = Typeface.createFromAsset(activity.getAssets(), "fonts/tommy_soft_bold.otf");
+        paintObject = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintObject.setTextSize(paintTextSize);
+        paintObject.setColor(bodyColor);
+
+        paintLines = new Paint(Paint.ANTI_ALIAS_FLAG);
+        paintLines.setTextSize(paintTextSize);
+        paintLines.setColor(bodyColor);
+        paintLines.setStrokeWidth(line_stroke);
+        paintLines.setStyle(Paint.Style.STROKE);
+
+        textFont = Typeface.createFromAsset(activity.getAssets(), "fonts/poppins_bold.ttf");
         paintWhite = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintWhite.setColor(getContext().getResources().getColor(R.color.white));
         paintWhite.setTextSize(paintTextSize);
@@ -133,7 +139,7 @@ public class DonutChart extends View {
         paintMiddleText = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintMiddleText.setColor(activity.getResources().getColor(R.color.grey_text));
         paintMiddleText.setDither(true);
-        paintMiddleText.setTypeface(tommyFontBold);
+        paintMiddleText.setTypeface(textFont);
         paintMiddleText.setTextAlign(Paint.Align.RIGHT);
 
         paintWarn = new Paint(Paint.ANTI_ALIAS_FLAG);
@@ -142,14 +148,14 @@ public class DonutChart extends View {
     }
 
     private int width;
-    private int tbWidth;//textBoxların genişliği
+    private int tbWidth;
     private int tbHeight;
     private int fold_gap;
-    private List<Integer> pie_x;// grafik çemberinin üzerinden çıkan çizgilerin başlangıç noktası
+    private List<Integer> pie_x;
     private List<Integer> pie_y;
-    private List<Integer> qua_x;// çemberden textBoxlara giden çizginin kıvrıldığı nokta
+    private List<Integer> qua_x;
     private List<Integer> qua_y;
-    private List<Integer> tb_x;// textBox (tb_x) 'ların noktaları alındı
+    private List<Integer> tb_x;
     private List<Integer> tb_y;
 
     private int offset;
@@ -212,7 +218,14 @@ public class DonutChart extends View {
         for (int k = 0; k < donutObjects.size(); k++) {
 
             int real_angle = start_angle.get(k) + sweep_angle.get(k) / 2;
-            canvas.drawArc(oval, (start_angle.get(k) - 90), sweep_angle.get(k), true, paint[k]);
+
+            int col = donutObjects.get(k).getColor();
+            if(col!=0) paintObject.setColor(col);
+            else paintObject.setColor(rColor.getColor(k));
+
+            Log.d(TAG, "onDraw: "+k+" : "+col);
+
+            canvas.drawArc(oval, (start_angle.get(k) - 90), sweep_angle.get(k), true,paintObject );
             pie_x.add(angularPoints(real_angle, 0).get(0));
             pie_y.add(angularPoints(real_angle, 0).get(1));
             qua_x.add(angularPoints(real_angle, fold_gap).get(0));
@@ -224,14 +237,17 @@ public class DonutChart extends View {
         if (control_text) {
             try {
                 for (int i = 0; i < donutObjects.size(); i++) {
+                    int col = donutObjects.get(i).getColor();
+                    if(col!=0) paintLines.setColor(col);
+                    else paintLines.setColor(rColor.getColor(i));
+
                     final Path pathf = new Path();
                     pathf.moveTo(pie_x.get(i), pie_y.get(i));
                     pathf.quadTo(qua_x.get(i), qua_y.get(i), tb_x.get(i), tb_y.get(i));
-                    canvas.drawPath(pathf, paintLine[i]);
+                    canvas.drawPath(pathf, paintLines);
                 }
             } catch (Exception e) {
             }
-
         }
 
         // middle layer swipe
@@ -262,9 +278,7 @@ public class DonutChart extends View {
 
     private List<Integer> start_angle;
     private List<Integer> sweep_angle;
-
     private List<String> percentValue;
-
     public void setParams(List<DonutObject> donutObjects) {
 
         /*
@@ -340,7 +354,7 @@ public class DonutChart extends View {
                     createTextBox(optimizeName(donutObjects.get(k).getName()) + "\n" + percentValue.get(k),
                             real_angle, k, donutObjects.get(k).getId());
                 }
-                drawMiddleText();
+                //setMiddleText();
                 control_text = true;
             }
 
@@ -472,24 +486,19 @@ public class DonutChart extends View {
             }
 
         } catch (Exception e) {
+            Log.d(TAG, "setMiddleText: "+e.getMessage());
         }
 
     }
 
     private void drawMiddleText(){
-        String new_middle_text="";
+
         List<String> list = ParseString.get(middle_text," ");
-        for(String s:list){
-            new_middle_text = middle_text +"\n"+s;
-        }
 
         float ver_step = width/12;
-
         int size = list.size();
 
-        if(size == 1){
-
-        }
+        if(size == 1){}
         if(size > 1){
             ver_step =width/15;
         }
@@ -513,7 +522,6 @@ public class DonutChart extends View {
         for(int i=0; i<list.size();i++){
             canvas.drawText(list.get(i),x,y+ver_step*i +(ver_step/(size+1)) ,paintMiddleText);
         }
-
     }
 
     public void setBodyColor(int color){
@@ -564,7 +572,6 @@ public class DonutChart extends View {
                     double alfaDeg = Math.toDegrees(alfa);
                     if (x < getWidth() / 2) {
                         alfaDeg = 360 - alfaDeg;
-
                     }
 
                     for (int i = 0; i < donutObjects.size(); i++) {
@@ -599,7 +606,6 @@ public class DonutChart extends View {
 
         if (category.length() > 10) {
             for (int i = 0; i < category.length(); i++) {
-
                 if (i <= 6) {
                     char fchar = category.charAt(i);
                     new_name = new_name + fchar;
@@ -614,7 +620,6 @@ public class DonutChart extends View {
         } else {
             new_name = category;
         }
-
         return new_name;
     }
 
@@ -630,8 +635,4 @@ public class DonutChart extends View {
     public DonutChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
-
-
-
-
 }
