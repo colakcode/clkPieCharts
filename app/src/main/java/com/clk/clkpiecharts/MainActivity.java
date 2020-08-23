@@ -17,6 +17,7 @@ import com.clk.clkpieanddonut.models.PieObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 public class MainActivity extends AppCompatActivity implements ClickPieSlice, ClickDonutSlice {
 
@@ -36,8 +37,8 @@ public class MainActivity extends AppCompatActivity implements ClickPieSlice, Cl
         tvInfo = findViewById(R.id.tvInfo);
         init();
 
-        callPieChart();
-        //callDonutChart();
+        //callPieChart();
+        callDonutChart();
 
     }
 
@@ -65,7 +66,7 @@ public class MainActivity extends AppCompatActivity implements ClickPieSlice, Cl
     public void callPieChart(){
         layoutGraph.removeAllViews();
         pieChart = new PieChart(this, pieObjects, layoutGraph);
-        //pieChart.setBackgroundColor(getResources().getColor(R.color.grey_light));
+
         layoutGraph.addView(pieChart);
     }
 
@@ -73,21 +74,15 @@ public class MainActivity extends AppCompatActivity implements ClickPieSlice, Cl
         layoutGraph.removeAllViews();
         donutChart = new DonutChart(this, pieObjects, layoutGraph);
         donutChart.setMiddleText("2020 Expenses");
-        //donutChart.setBackgroundColor(getResources().getColor(R.color.grey_light));
         layoutGraph.addView(donutChart);
     }
 
     public void setMiddleText(View v) {
-//        if(donutChart!=null){
-//            Random r = new Random();
-//            donutChart.setMiddleText("2020 Expenses");
-//        }
-//        layoutGraph.removeAllViews();
-//        donutChart = new DonutChart(this, pieObjects, layoutGraph);
-//        donutChart.setMiddleText("2020 Expenses");
-//        //donutChart.setBackgroundColor(getResources().getColor(R.color.grey_light));
-//        layoutGraph.addView(donutChart);
-        pieChart.resetGraph();
+        if(donutChart!=null){
+            Random r = new Random();
+            donutChart.setMiddleText("2020 Expenses");
+        }
+
     }
 
     @Override

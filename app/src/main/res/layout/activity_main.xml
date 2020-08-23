@@ -10,7 +10,7 @@
     <Button
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Draw Graphic"
+        android:text="Set Middle Text"
         android:onClick="setMiddleText"
         android:layout_margin="10dp"
         android:textAllCaps="false"
@@ -18,8 +18,8 @@
         android:fontFamily="@font/poppins_bold"/>
 
     <RelativeLayout
-        android:layout_width="400dp"
-        android:layout_height="400dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:id="@+id/layoutGraph"
         android:layout_centerInParent="true"/>
 

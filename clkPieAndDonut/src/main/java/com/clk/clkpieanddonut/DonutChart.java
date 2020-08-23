@@ -30,7 +30,7 @@ import java.util.TimerTask;
 
 public class DonutChart extends View {
 
-    private static final String TAG = "clk_DoughnutChart";
+    private static final String TAG = "clk_DonutChart";
     private Activity activity;
     private List<PieObject> pieObjects;
     private RelativeLayout layoutGraph;
@@ -273,7 +273,7 @@ public class DonutChart extends View {
                 float rounded = canvasWidth/70;
 
                 if(y+tbH+5>canvasHeight) y = y - tbH;
-                if(x+tbW+5>canvasWidth) x = x - tbW/4;
+                if(x+tbW+5>canvasWidth) x = x - tbW/4-20;
 
                 tbPoints.add(new TextBoxPoints(x,y,i, pieObjects.get(i)));
 
