@@ -7,10 +7,29 @@
     tools:context=".MainActivity"
     android:background="@color/white">
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Draw Graphic"
+        android:onClick="setMiddleText"
+        android:layout_margin="10dp"
+        android:textAllCaps="false"
+        android:textColor="@color/blue_navy"
+        android:fontFamily="@font/poppins_bold"/>
+
     <RelativeLayout
-        android:layout_width="350dp"
-        android:layout_height="350dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         android:id="@+id/layoutGraph"
         android:layout_centerInParent="true"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/tvInfo"
+        android:layout_below="@+id/layoutGraph"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/poppins_medium"
+        android:layout_margin="10dp"/>
 
 </RelativeLayout>

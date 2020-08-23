@@ -1,21 +1,21 @@
 package com.clk.donutchart.models;
 
-public class DonutObject {
+public class PieObject {
     String id;
     String name;
     double value;
     int color;
 
-    public DonutObject(){}
+    public PieObject(){}
 
-    public DonutObject(String id, String name, double value, int color) {
+    public PieObject(String id, String name, double value, int color) {
         this.id = id;
         this.name = name;
         this.value = value;
         this.color = color;
     }
 
-    public DonutObject(String id, String name, double value) {
+    public PieObject(String id, String name, double value) {
         this.id = id;
         this.name = name;
         this.value = value;

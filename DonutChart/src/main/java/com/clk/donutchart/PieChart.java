@@ -15,13 +15,11 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 
-import com.clk.donutchart.Interfaces.ClickDonutSlice;
 import com.clk.donutchart.Interfaces.ClickPieSlice;
 import com.clk.donutchart.models.PieObject;
 import com.clk.donutchart.models.TextBoxPoints;
 import com.clk.donutchart.utils.AmountAccetable;
 import com.clk.donutchart.utils.OptimizeName;
-import com.clk.donutchart.utils.ParseString;
 import com.clk.donutchart.utils.ResourcesColor;
 
 import java.util.ArrayList;
@@ -29,13 +27,13 @@ import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
-public class DonutChart extends View {
+public class PieChart extends View {
 
     private static final String TAG = "clk_DoughnutChart";
     private Activity activity;
     private List<PieObject> pieObjects;
     private RelativeLayout layoutGraph;
-    private Paint paintBody, paintObjects, paintLines, paintMiddleText,
+    private Paint paintBody, paintObjects, paintLines,
             paintTextBox, paintTextBorer, paintTextFill;
     private int line_stroke = getContext().getResources().getInteger(R.integer.pie_line_stroke);
     private int bodyColor;
@@ -47,9 +45,9 @@ public class DonutChart extends View {
     private int gapStop = getContext().getResources().getInteger(R.integer.cake_graph_gap_stop);
     private boolean isGraphicFinished = false;
     private List<Float> pie_x, pie_y, qua_x, qua_y, tb_x, tb_y;
-    private float min_angle = 20;
+    private float min_angle=30;
 
-    public DonutChart(Activity activity, List<PieObject> pieObjects, RelativeLayout layoutGraph) {
+    public PieChart(Activity activity, List<PieObject> pieObjects, RelativeLayout layoutGraph) {
         super(activity);
         this.activity = activity;
         this.pieObjects = pieObjects;
@@ -82,12 +80,6 @@ public class DonutChart extends View {
         paintLines.setColor(bodyColor);
         paintLines.setStrokeWidth(line_stroke);
         paintLines.setStyle(Paint.Style.STROKE);
-
-        paintMiddleText = new Paint(Paint.ANTI_ALIAS_FLAG);
-        paintMiddleText.setColor(activity.getResources().getColor(R.color.grey_text));
-        paintMiddleText.setDither(true);
-        paintMiddleText.setTypeface(textFont);
-        paintMiddleText.setTextAlign(Paint.Align.CENTER);
 
         paintTextBox = new Paint(Paint.ANTI_ALIAS_FLAG);
         paintTextBox.setColor(activity.getResources().getColor(R.color.grey_text));
@@ -192,9 +184,6 @@ public class DonutChart extends View {
             start_angle = start_angle + sweep_angle;
         }
 
-        // middle layer swipe
-        paintBody.setColor(bodyColor);
-        canvas.drawCircle(centerX, centerY, middle_circle_radius, paintBody);
         // top layer swipe
         RectF ovalWhiteMask = new RectF();
         ovalWhiteMask.set(0, 0, getRight(), getBottom());
@@ -206,7 +195,6 @@ public class DonutChart extends View {
 
         if (isGraphicFinished) {
                 drawTextBoxes();
-                if(!isCreatedMiddleText) createMiddleText(textMiddle);
         }
     }
 
@@ -273,7 +261,7 @@ public class DonutChart extends View {
                 float tbH = canvasHeight/16;
                 float rounded = canvasWidth/70;
 
-                if(y+tbH+5>canvasHeight) y = y - tbH;
+                if(y+tbHeight+5>canvasHeight) y = y - tbH;
                 if(x+tbW+5>canvasWidth) x = x - tbW/4;
 
                 tbPoints.add(new TextBoxPoints(x,y,i, pieObjects.get(i)));
@@ -283,7 +271,7 @@ public class DonutChart extends View {
                 else paintLines.setColor(resourcesColor.getColor(i));
                 final Path pathf = new Path();
                 pathf.moveTo(angularPoints(real_angle, 0).get(0), angularPoints(real_angle, 0).get(1));
-
+                float step = -5;
                 pathf.quadTo(angularPoints(real_angle, fold_gap).get(0), angularPoints(real_angle, fold_gap).get(1),
                         x+tbW/2, y+tbH/2);
 
@@ -303,34 +291,6 @@ public class DonutChart extends View {
         DRAW_TEXT_RQS = position;
         touched_object = position;
         changeRadius(position);
-    }
-
-    public void setMiddleText(String text){
-       this.textMiddle = text;
-       if(isGraphicFinished) drawAgain();
-    }
-
-    private String textMiddle="";
-    private boolean isCreatedMiddleText = false;
-    private void createMiddleText(String text){
-        this.textMiddle = text;
-        float tbW = canvasWidth/6;
-        float tbH = canvasHeight/16;
-        List<String> list = ParseString.get(textMiddle, " ");
-
-        int start =0 - (int)list.size()/2;
-        int textLength = 0;
-
-        for(String sl : list){
-            if(sl.length()>textLength) textLength = sl.length();
-        }
-        float textSize = canvasWidth/(10+list.size()+textLength);;
-        paintMiddleText.setTextSize(textSize);
-        for(int i = 0; i<list.size();i++){
-            String s = list.get(i);
-            if(s.length()>textLength) textLength = s.length();
-            canvas.drawText(s, centerX, centerY+(i+start)*textSize + textSize/2, paintMiddleText);
-        }
     }
 
     public void setBackgroundColor(int color){
@@ -448,8 +408,8 @@ public class DonutChart extends View {
                     for (int i = 0; i < pieObjects.size(); i++) {
                         if (alfaDeg > start_angles.get(i) && alfaDeg < start_angles.get(i) + sweep_angles.get(i)) {
                             try {
-                                ClickDonutSlice clickDonutSlice = (ClickDonutSlice) activity;
-                                clickDonutSlice.getDonutSliceInfo(pieObjects.get(i), i, percentage_value.get(i));
+                                ClickPieSlice clickPieSlice = (ClickPieSlice) activity;
+                                clickPieSlice.getPieSliceInfo(pieObjects.get(i), i, percentage_value.get(i));
                                 touched_object = i;
                                 DRAW_TEXT_RQS = i;
                                 changeRadius(i);
@@ -474,8 +434,13 @@ public class DonutChart extends View {
                         }
                     }
                     if(check_touch_box){
-                        ClickDonutSlice clickDonutSlice = (ClickDonutSlice) activity;
-                        clickDonutSlice.getDonutSliceInfo(selected_point.getPieObject(), selected_point.getPosition(), percentage_value.get(selected_point.getPosition()));
+                        int pos = selected_point.getPosition();
+                        ClickPieSlice clickPieSlice = (ClickPieSlice) activity;
+                        clickPieSlice.getPieSliceInfo(selected_point.getPieObject(), pos, percentage_value.get(pos));
+
+                        touched_object = pos;
+                        DRAW_TEXT_RQS = pos;
+                        changeRadius(pos);
                         Log.d(TAG, "onTouchEvent: \nx : "+selected_point.getX()+
                                 "\ny : "+selected_point.getY()+
                                 "\npos : "+selected_point.getPosition()+
@@ -491,15 +456,15 @@ public class DonutChart extends View {
         return value;
     }
 
-    public DonutChart(Context context, @Nullable AttributeSet attrs) {
+    public PieChart(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public DonutChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
+    public PieChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 
-    public DonutChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
+    public PieChart(Context context, @Nullable AttributeSet attrs, int defStyleAttr, int defStyleRes) {
         super(context, attrs, defStyleAttr, defStyleRes);
     }
 }

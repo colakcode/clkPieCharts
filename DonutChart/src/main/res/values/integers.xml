@@ -21,7 +21,7 @@
     <integer name="text_x_back">100</integer>
     <integer name="pie_text_width">250</integer>
     <integer name="pie_text_height">75</integer>
-    <integer name="middle_circle_radius">200</integer>//
+    <integer name="middle_circle_radius">150</integer>//
     <integer name="qua_gap">120</integer>// cake graph line kıvrılma noktası
     <integer name="pie_text_size">7</integer>//
     <integer name="sw">0</integer>//

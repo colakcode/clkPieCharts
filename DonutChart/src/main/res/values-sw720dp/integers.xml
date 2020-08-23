@@ -17,12 +17,12 @@
     <integer name="cake_graph_text_size_warn">80</integer>
     <integer name="cake_graph_offset_max">120</integer>
     <integer name="cake_graph_offset_min">15</integer>
-    <integer name="cake_graph_gap_stop">200</integer>
-    <integer name="cake_graph_gap_start">650</integer>
+    <integer name="cake_graph_gap_stop">0</integer>
+    <integer name="cake_graph_gap_start">450</integer>
     <integer name="text_x_back">100</integer>
     <integer name="pie_text_width">600</integer>
     <integer name="pie_text_height">180</integer>
-    <integer name="middle_circle_radius">200</integer>//
+    <integer name="middle_circle_radius">150</integer>//
     <integer name="qua_gap">120</integer>// cake graph line kıvrılma noktası
     <integer name="pie_text_size">12</integer>//
     <integer name="sw">0</integer>//

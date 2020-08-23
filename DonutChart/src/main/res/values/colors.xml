@@ -76,6 +76,7 @@
     <color name="red_holo">#AEE90400</color>
     <color name="red_pure">#ff0000</color>
     <color name="red_fuchsia">#F012BE</color>
+    <color name="pink_light">#FF4081</color>
     <color name="red_light">#e4858c</color>
     <color name="red_velvet">#581845</color>
     <color name="red_velvet_real">#7D0552</color>
@@ -88,7 +89,7 @@
     <color name="purple_real">#8352c4</color>
     <color name="purple_light">#c7b0e7</color>
     <color name="pink">#f916ee</color>
-    <color name="pink_light">#f4b4f1</color>
+    <color name="pink_lighter">#f4b4f1</color>
     <color name="pink_violent">#F6358A</color>
     <color name="pink_lemonade">#E4287C</color>
     <color name="magenta">#E4287C</color>
