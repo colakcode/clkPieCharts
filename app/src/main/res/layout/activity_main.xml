@@ -18,8 +18,8 @@
         android:fontFamily="@font/poppins_bold"/>
 
     <RelativeLayout
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="400dp"
+        android:layout_height="400dp"
         android:id="@+id/layoutGraph"
         android:layout_centerInParent="true"/>
 
