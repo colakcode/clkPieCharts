@@ -2,7 +2,7 @@
 # clkPieCharts
 [![Platform](https://img.shields.io/badge/platform-android-green.svg)](https://developer.android.com/)
 [![API](https://img.shields.io/badge/API-21%2B-brightgreen.svg?style=flat)](https://developer.android.com/about/versions/android-5.0)
-[![API](https://img.shields.io/badge/jitpack-v0.1.1-success)](https://jitpack.io/#colakcode/clkPieCharts/v0.1.1)
+[![API](https://img.shields.io/badge/jitpack-v0.1.1-blue)](https://jitpack.io/#colakcode/clkPieCharts/v0.1.1)
 [![API](https://img.shields.io/github/license/colakcode/clkProgress)](https://github.com/colakcode/clkProgress/blob/master/LICENSE)
 
 ## Pie Chart and Donut Chart 
