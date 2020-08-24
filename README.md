@@ -24,14 +24,14 @@ Step 1 : Add it in your root build.gradle at the end of repositories:<br/><br/>
 Step 2. Add the dependency
 
     dependencies {
-            implementation 'com.github.colakcode:clkPieCharts:v0.1.0'
+            implementation 'com.github.colakcode:clkPieCharts:v0.1.1'
     }
 
 ## Usage
 
 #### XML File
 
-Add a Relativelayout of equal width and height to your XML file.
+Add a RelativeLayout of equal width and height to your XML file.
 
     <RelativeLayout
         android:layout_width="300dp"
