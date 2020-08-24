@@ -7,6 +7,7 @@
 
 ## Pie Chart and Donut Chart 
 
+
 The clkPieCharts library allows you to easily create stylish pie and donut graphics in your application.<br/>
 <img src="media/pie.png" height="350"/> <img src="media/donut.png" height="350"/> 
 
@@ -139,6 +140,10 @@ Clicking on an empty area resets the graph. You can also do this outside of the 
 ### Compatibility and Some Other Notes
 The clkPieCharts library is written in java and requires a minimum Android API level of 21.
 
+### Some Visuals from clkPieCharts
+
+<img src="media/clkdonut_at_phone.png" height="520"/><br/>
+<img src="media/clk_donut.gif" height="500"/> 
     
 ## Author
 Kemal ÇOLAK [@colakcode](https://github.com/colakcode/) on GitHub
