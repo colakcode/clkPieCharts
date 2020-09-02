@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 
-import com.clk.clkpieanddonut.Interfaces.ClickDonutSlice;
+import com.clk.clkpieanddonut.Interfaces.ClkChartsInterface;
 import com.clk.clkpieanddonut.models.PieObject;
 import com.clk.clkpieanddonut.models.TextBoxPoints;
 import com.clk.clkpieanddonut.utils.AmountAccetable;
@@ -61,9 +61,8 @@ public class DonutChart extends View {
         tb_x = new ArrayList<>();
         tb_y = new ArrayList<>();
 
-        int size = pieObjects.size();
-        min_angle = 360/(size/1.25f);
-        if(min_angle > 20) min_angle = 0;
+        min_angle=20;
+        if(min_angle > 25) min_angle = 0;
 
         bodyColor = activity.getResources().getColor(R.color.white);
         textFont = Typeface.createFromAsset(activity.getAssets(), "fonts/poppins_bold.ttf");
@@ -175,7 +174,9 @@ public class DonutChart extends View {
             PieObject pieObject = pieObjects.get(i);
             float sweep_angle = getSweepAngle(pieObject.getValue());
             float real_angle = start_angle + sweep_angle / 2;
-            paintObjects.setColor(pieObject.getColor() == 0 ? resourcesColor.getColor(i) : pieObject.getColor());
+            int color = pieObject.getColor() == 0 ? resourcesColor.getColor(i) : pieObject.getColor();
+            paintObjects.setColor(color);
+            pieObjects.get(i).setColor(color);
             float obj_radius;
             if (i == touched_object) obj_radius = seperate_raduis;
             else obj_radius = non_touched_radius;
@@ -251,7 +252,6 @@ public class DonutChart extends View {
 
     private boolean isChangeAngleCalled = false;
     private List<TextBoxPoints> tbPoints;
-
     public void drawTextBoxes() {
         tbPoints = new ArrayList<>();
         tbPoints.clear();
@@ -259,7 +259,7 @@ public class DonutChart extends View {
 
             if(DRAW_TEXT_RQS==-9999 || DRAW_TEXT_RQS ==i){
 
-                if(sweep_angles.get(i)<min_angle && DRAW_TEXT_RQS == -9999) continue;
+                if(sweep_angles.get(i) < min_angle && DRAW_TEXT_RQS == -9999) continue;
 
                 float real_angle = real_angles.get(i);
 
@@ -310,7 +310,7 @@ public class DonutChart extends View {
     }
 
     private String textMiddle="";
-    private boolean isCreatedMiddleText = false;
+    private static boolean isCreatedMiddleText = false;
     private void createMiddleText(String text){
         this.textMiddle = text;
         float tbW = canvasWidth/6;
@@ -337,6 +337,10 @@ public class DonutChart extends View {
        // drawAgain();
     }
 
+    private List<Double> getPercentage_values(){
+        return percentage_value;
+    }
+
     private void drawAgain() {
         isChangeAngleCalled = true;
         new Timer().scheduleAtFixedRate(new TimerTask() {
@@ -354,6 +358,7 @@ public class DonutChart extends View {
 
     private void changeAngle() {
         isChangeAngleCalled = true;
+        isGraphicFinished = false;
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
             public void run() {
@@ -365,6 +370,8 @@ public class DonutChart extends View {
                     cancel();
                     gapStart = 0;
                     isGraphicFinished = true;
+                    ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
+                    clkChartsInterface.getPercentage(percentage_value);
                     return;
                 }
                 postInvalidate();
@@ -452,8 +459,8 @@ public class DonutChart extends View {
                     for (int i = 0; i < pieObjects.size(); i++) {
                         if (alfaDeg > start_angles.get(i) && alfaDeg < start_angles.get(i) + sweep_angles.get(i)) {
                             try {
-                                ClickDonutSlice clickDonutSlice = (ClickDonutSlice) activity;
-                                clickDonutSlice.getDonutSliceInfo(pieObjects.get(i), i, percentage_value.get(i));
+                                ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
+                                clkChartsInterface.pieItemClick(pieObjects.get(i), i, percentage_value.get(i));
                                 touched_object = i;
                                 DRAW_TEXT_RQS = i;
                                 changeRadius(i);
@@ -479,8 +486,8 @@ public class DonutChart extends View {
                     }
                     if(check_touch_box){
                         int pos = selected_point.getPosition();
-                        ClickDonutSlice clickDonutSlice = (ClickDonutSlice) activity;
-                        clickDonutSlice.getDonutSliceInfo(selected_point.getPieObject(),pos, percentage_value.get(pos));
+                        ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
+                        clkChartsInterface.pieItemClick(selected_point.getPieObject(),pos, percentage_value.get(pos));
 
                         touched_object = pos;
                         DRAW_TEXT_RQS = pos;

@@ -15,7 +15,7 @@ import android.widget.RelativeLayout;
 
 import androidx.annotation.Nullable;
 
-import com.clk.clkpieanddonut.Interfaces.ClickPieSlice;
+import com.clk.clkpieanddonut.Interfaces.ClkChartsInterface;
 import com.clk.clkpieanddonut.models.PieObject;
 import com.clk.clkpieanddonut.models.TextBoxPoints;
 import com.clk.clkpieanddonut.utils.AmountAccetable;
@@ -60,9 +60,8 @@ public class PieChart extends View {
         tb_x = new ArrayList<>();
         tb_y = new ArrayList<>();
 
-        int size = pieObjects.size();
-        min_angle = 360/(size/1.25f);
-        if(min_angle > 20) min_angle = 0;
+        min_angle = 20;
+        if(min_angle > 25) min_angle = 0;
 
         bodyColor = activity.getResources().getColor(R.color.white);
         textFont = Typeface.createFromAsset(activity.getAssets(), "fonts/poppins_bold.ttf");
@@ -168,7 +167,9 @@ public class PieChart extends View {
             PieObject pieObject = pieObjects.get(i);
             float sweep_angle = getSweepAngle(pieObject.getValue());
             float real_angle = start_angle + sweep_angle / 2;
-            paintObjects.setColor(pieObject.getColor() == 0 ? resourcesColor.getColor(i) : pieObject.getColor());
+            int color = pieObject.getColor() == 0 ? resourcesColor.getColor(i) : pieObject.getColor();
+            paintObjects.setColor(color);
+            pieObjects.get(i).setColor(color);
             float obj_radius;
             if (i == touched_object) obj_radius = seperate_raduis;
             else obj_radius = non_touched_radius;
@@ -326,6 +327,8 @@ public class PieChart extends View {
                     cancel();
                     gapStart = 0;
                     isGraphicFinished = true;
+                    ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
+                    clkChartsInterface.getPercentage(percentage_value);
                     return;
                 }
                 postInvalidate();
@@ -413,8 +416,8 @@ public class PieChart extends View {
                     for (int i = 0; i < pieObjects.size(); i++) {
                         if (alfaDeg > start_angles.get(i) && alfaDeg < start_angles.get(i) + sweep_angles.get(i)) {
                             try {
-                                ClickPieSlice clickPieSlice = (ClickPieSlice) activity;
-                                clickPieSlice.getPieSliceInfo(pieObjects.get(i), i, percentage_value.get(i));
+                                ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
+                                clkChartsInterface.pieItemClick(pieObjects.get(i), i, percentage_value.get(i));
                                 touched_object = i;
                                 DRAW_TEXT_RQS = i;
                                 changeRadius(i);
@@ -440,8 +443,9 @@ public class PieChart extends View {
                     }
                     if(check_touch_box){
                         int pos = selected_point.getPosition();
-                        ClickPieSlice clickPieSlice = (ClickPieSlice) activity;
-                        clickPieSlice.getPieSliceInfo(selected_point.getPieObject(), pos, percentage_value.get(pos));
+
+                        ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
+                        clkChartsInterface.pieItemClick(selected_point.getPieObject(), pos, percentage_value.get(pos));
 
                         touched_object = pos;
                         DRAW_TEXT_RQS = pos;
