@@ -160,6 +160,10 @@ public class PieChart extends View {
         sweep_angles = new ArrayList<>();
         real_angles = new ArrayList<>();
         percentage_value = new ArrayList<>();
+        start_angles.clear();
+        sweep_angles.clear();
+        real_angles.clear();
+        percentage_value.clear();
 
         getTotalValue();
         float start_angle = 0;
@@ -417,7 +421,7 @@ public class PieChart extends View {
                         if (alfaDeg > start_angles.get(i) && alfaDeg < start_angles.get(i) + sweep_angles.get(i)) {
                             try {
                                 ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
-                                clkChartsInterface.pieItemClick(pieObjects.get(i), i, percentage_value.get(i));
+                                clkChartsInterface.onClickPieSlice(pieObjects.get(i), i, percentage_value.get(i));
                                 touched_object = i;
                                 DRAW_TEXT_RQS = i;
                                 changeRadius(i);
@@ -445,7 +449,7 @@ public class PieChart extends View {
                         int pos = selected_point.getPosition();
 
                         ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
-                        clkChartsInterface.pieItemClick(selected_point.getPieObject(), pos, percentage_value.get(pos));
+                        clkChartsInterface.onClickTextBox(selected_point.getPieObject(), pos, percentage_value.get(pos));
 
                         touched_object = pos;
                         DRAW_TEXT_RQS = pos;

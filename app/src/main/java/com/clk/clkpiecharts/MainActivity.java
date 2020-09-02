@@ -107,7 +107,7 @@ public class MainActivity extends AppCompatActivity implements ClkChartsInterfac
     }
 
     @Override
-    public void pieItemClick(PieObject pieObject, int position, double percentage) {
+    public void onClickPieSlice(PieObject pieObject, int position, double percentage) {
         Log.d(TAG, "getSliceInfo: " + "\n" +
                 "position : " + position + "\n" +
                 "id : " + pieObject.getId() + "\n" +
@@ -123,5 +123,10 @@ public class MainActivity extends AppCompatActivity implements ClkChartsInterfac
                 "value : " + pieObject.getValue() + "\n" +
                 "color : " + pieObject.getColor() + "\n" +
                 "percentage : " + percentage);
+    }
+
+    @Override
+    public void onClickTextBox(PieObject pieObject, int position, double percentage) {
+
     }
 }

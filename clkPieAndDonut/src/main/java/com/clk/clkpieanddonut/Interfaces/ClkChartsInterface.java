@@ -6,5 +6,6 @@ import java.util.List;
 
 public interface ClkChartsInterface {
     void getPercentage(List<Double> percantage_values);
-    void pieItemClick(PieObject pieObject, int position, double percentage);
+    void onClickPieSlice(PieObject pieObject, int position, double percentage);
+    void onClickTextBox(PieObject pieObject, int position, double percentage);
 }

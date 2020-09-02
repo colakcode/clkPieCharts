@@ -460,7 +460,7 @@ public class DonutChart extends View {
                         if (alfaDeg > start_angles.get(i) && alfaDeg < start_angles.get(i) + sweep_angles.get(i)) {
                             try {
                                 ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
-                                clkChartsInterface.pieItemClick(pieObjects.get(i), i, percentage_value.get(i));
+                                clkChartsInterface.onClickPieSlice(pieObjects.get(i), i, percentage_value.get(i));
                                 touched_object = i;
                                 DRAW_TEXT_RQS = i;
                                 changeRadius(i);
@@ -487,7 +487,7 @@ public class DonutChart extends View {
                     if(check_touch_box){
                         int pos = selected_point.getPosition();
                         ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
-                        clkChartsInterface.pieItemClick(selected_point.getPieObject(),pos, percentage_value.get(pos));
+                        clkChartsInterface.onClickTextBox(selected_point.getPieObject(),pos, percentage_value.get(pos));
 
                         touched_object = pos;
                         DRAW_TEXT_RQS = pos;
