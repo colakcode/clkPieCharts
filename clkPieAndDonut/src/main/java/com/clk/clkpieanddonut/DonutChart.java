@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -381,7 +382,6 @@ public class DonutChart extends View {
 
     private void changeRadius(final int position) {
         //isGraphicFinished = false;
-
         seperate_raduis = 0;
         new Timer().scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -424,7 +424,6 @@ public class DonutChart extends View {
     }
 
     private boolean isTouched = false;
-
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         boolean value = super.onTouchEvent(event);
@@ -470,36 +469,40 @@ public class DonutChart extends View {
                         }
                     }
                 } else {
-                    float tbW = canvasWidth/6;
-                    float tbH = canvasHeight/16;
-                    TextBoxPoints selected_point = new TextBoxPoints();
-                    boolean check_touch_box = false;
-                    for(int i=0 ; i<tbPoints.size(); i++){
-                        TextBoxPoints tbp = tbPoints.get(i);
-                        if(x>tbp.getX() && x<tbp.getX()+tbW){
-                            if(y>tbp.getY() && y<tbp.getY()+tbH){
-                                check_touch_box = true;
-                                selected_point = tbp;
-                                break;
+                    try{
+                        float tbW = canvasWidth/6;
+                        float tbH = canvasHeight/16;
+                        TextBoxPoints selected_point = new TextBoxPoints();
+                        boolean check_touch_box = false;
+                        for(int i=0 ; i < tbPoints.size(); i++){
+                            TextBoxPoints tbp = tbPoints.get(i);
+                            if(x>tbp.getX() && x<tbp.getX()+tbW){
+                                if(y>tbp.getY() && y<tbp.getY()+tbH){
+                                    check_touch_box = true;
+                                    selected_point = tbp;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if(check_touch_box){
-                        int pos = selected_point.getPosition();
-                        ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
-                        clkChartsInterface.onClickTextBox(selected_point.getPieObject(),pos, percentage_value.get(pos));
+                        if(check_touch_box){
+                            int pos = selected_point.getPosition();
+                            ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
+                            clkChartsInterface.onClickTextBox(selected_point.getPieObject(),pos, percentage_value.get(pos));
 
-                        touched_object = pos;
-                        DRAW_TEXT_RQS = pos;
-                        changeRadius(pos);
+                            touched_object = pos;
+                            DRAW_TEXT_RQS = pos;
+                            changeRadius(pos);
 
-                        Log.d(TAG, "onTouchEvent: \nx : "+selected_point.getX()+
-                                "\ny : "+selected_point.getY()+
-                                "\npos : "+selected_point.getPosition()+
-                                "\nname : "+selected_point.getPieObject().getName());
-
-                    }else{
-                        resetRadius();
+                            Log.d(TAG, "onTouchEvent: \nx : "+selected_point.getX()+
+                                    "\ny : "+selected_point.getY()+
+                                    "\npos : "+selected_point.getPosition()+
+                                    "\nname : "+selected_point.getPieObject().getName());
+                        }else{
+                            resetRadius();
+                        }
+                        
+                    }catch (NullPointerException e){
+                        e.printStackTrace();
                     }
                 }
             }

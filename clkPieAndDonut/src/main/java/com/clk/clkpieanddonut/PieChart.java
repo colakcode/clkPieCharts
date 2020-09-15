@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.RelativeLayout;
+import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
@@ -431,36 +432,40 @@ public class PieChart extends View {
                         }
                     }
                 } else {
-                    float tbW = canvasWidth/6;
-                    float tbH = canvasHeight/16;
-                    TextBoxPoints selected_point = new TextBoxPoints();
-                    boolean check_touch_box = false;
-                    for(int i=0 ; i<tbPoints.size(); i++){
-                        TextBoxPoints tbp = tbPoints.get(i);
-                        if(x>tbp.getX() && x<tbp.getX()+tbW){
-                            if(y>tbp.getY() && y<tbp.getY()+tbH){
-                                check_touch_box = true;
-                                selected_point = tbp;
-                                break;
+                    try{
+                        float tbW = canvasWidth/6;
+                        float tbH = canvasHeight/16;
+                        TextBoxPoints selected_point = new TextBoxPoints();
+                        boolean check_touch_box = false;
+                        for(int i=0 ; i<tbPoints.size(); i++){
+                            TextBoxPoints tbp = tbPoints.get(i);
+                            if(x>tbp.getX() && x<tbp.getX()+tbW){
+                                if(y>tbp.getY() && y<tbp.getY()+tbH){
+                                    check_touch_box = true;
+                                    selected_point = tbp;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if(check_touch_box){
-                        int pos = selected_point.getPosition();
+                        if(check_touch_box){
+                            int pos = selected_point.getPosition();
 
-                        ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
-                        clkChartsInterface.onClickTextBox(selected_point.getPieObject(), pos, percentage_value.get(pos));
+                            ClkChartsInterface clkChartsInterface = (ClkChartsInterface) activity;
+                            clkChartsInterface.onClickTextBox(selected_point.getPieObject(), pos, percentage_value.get(pos));
 
-                        touched_object = pos;
-                        DRAW_TEXT_RQS = pos;
-                        changeRadius(pos);
-                        Log.d(TAG, "onTouchEvent: \nx : "+selected_point.getX()+
-                                "\ny : "+selected_point.getY()+
-                                "\npos : "+selected_point.getPosition()+
-                                "\nname : "+selected_point.getPieObject().getName());
+                            touched_object = pos;
+                            DRAW_TEXT_RQS = pos;
+                            changeRadius(pos);
+                            Log.d(TAG, "onTouchEvent: \nx : "+selected_point.getX()+
+                                    "\ny : "+selected_point.getY()+
+                                    "\npos : "+selected_point.getPosition()+
+                                    "\nname : "+selected_point.getPieObject().getName());
 
-                    }else{
-                        resetRadius();
+                        }else{
+                            resetRadius();
+                        }
+                    }catch (NullPointerException e){
+                        e.printStackTrace();
                     }
                 }
             }
